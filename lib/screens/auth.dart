@@ -7,6 +7,37 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:google_sign_in/google_sign_in.dart';
+
+final GoogleSignIn _googleSignIn = GoogleSignIn(scopes: ['email']);
+
+Future<void> _signInWithGoogle() async {
+  try {
+    final GoogleSignInAccount? googleSignInAccount = await _googleSignIn.signIn();
+
+    if (googleSignInAccount == null) {
+      // The user canceled the sign-in process
+      return;
+    }
+
+    final GoogleSignInAuthentication googleSignInAuthentication = await googleSignInAccount.authentication;
+    final AuthCredential credential = GoogleAuthProvider.credential(
+      accessToken: googleSignInAuthentication.accessToken,
+      idToken: googleSignInAuthentication.idToken,
+    );
+
+    final UserCredential authResult = await _firebase.signInWithCredential(credential);
+    final User? user = authResult.user;
+
+    if (user != null) {
+      // Handle successful Google Sign-In
+      // You can add your logic here, e.g., navigate to the home screen
+    }
+  } catch (error) {
+    print('Error during Google Sign-In: $error');
+  }
+}
+
 
 final _firebase = FirebaseAuth.instance;
 
@@ -190,6 +221,15 @@ class _AuthScreenState extends State<AuthScreen> {
                                     child: Text(AuthChangeState.isLogin
                                         ? 'Create an account'
                                         : 'I already have an account'),
+                                  ),
+                                if (!_isAuthenticating)
+                                  ElevatedButton.icon(
+                                    onPressed: _signInWithGoogle,
+                                    icon: Icon(Icons.g_mobiledata), // You can replace this with a Google logo
+                                    label: Text('Sign In with Google'),
+                                    style: ElevatedButton.styleFrom(
+                                      primary: Colors.white, // Use the Google color or customize
+                                    ),
                                   ),
                               ],
                             ),
