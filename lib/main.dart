@@ -18,11 +18,13 @@ class App extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MultiProvider(providers: [
+    return MultiProvider(providers:
+    [
       ChangeNotifierProvider(
         create: (context) => AuthChangeState(),
       ),
-    ],child: MaterialApp(
+    ]
+      ,child: MaterialApp(
       title: 'FlutterChat',
       theme: ThemeData().copyWith(
         useMaterial3: true,
